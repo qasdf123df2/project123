@@ -1,0 +1,27 @@
+import chess
+import chess.engine
+import serial
+import time
+
+
+engine = chess.engine.SimpleEngine.popen_uci("/usr/games/stockfish")  
+arduino = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+
+def read_response():
+    response = arduino.readline()
+    return response
+
+
+board = chess.Board("4k3/8/4K3/8/7Q/8/8/8 w - - 0 1")  
+result = engine.play(board, chess.engine.Limit(time=2)) 
+s = str(result.move)
+s1 = s[0]+s[1]
+s2 = s[2] + s[3]
+sFinal = s1+"; " + s2
+sFinal = sFinal.strip().upper()  
+arduino.write((sFinal).encode('utf-8'))  
+time.sleep(5)
+print("ans:", read_response())
+print(sFinal)
+
+engine.quit()
